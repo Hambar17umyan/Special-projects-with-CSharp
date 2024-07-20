@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -208,7 +209,13 @@ namespace Battleship
                         bool b;
                         x = int.Parse(Console.ReadLine());
                         y = int.Parse(Console.ReadLine());
-                        b = char.Parse(Console.ReadLine().ToLower()) == 'h';
+                        char chr = char.Parse(Console.ReadLine().ToLower());
+                        if (chr == 'h')
+                            b = true;
+                        else if (chr == 'v')
+                            b = false;
+                        else
+                            throw new Exception();
                         if (!CheckIfValid(x, y, b, i, own))
                         {
                             Console.WriteLine("Invalid input!. Please check the requirements again and renew your input!");
@@ -221,6 +228,7 @@ namespace Battleship
                         }
                         else
                         {
+                            Debug.WriteLine("Entered line 231");
                             PlaceShip(x, y, i, b, ref own);
                             Ships[ship] = i;
                             MotherShip[x, y] = ship;
