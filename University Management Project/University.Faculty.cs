@@ -48,7 +48,7 @@ namespace University_Management_Project
                 return Message.Success;
             }
 
-            private Grade CountAvarageAdmissionExamGrade(StudentInputModel student)
+            private decimal CountAvarageAdmissionExamGrade(StudentInputModel student)
             {
                 int c = 0;
                 decimal gr = 0;
@@ -62,7 +62,7 @@ namespace University_Management_Project
                 }
 
                 gr /= c;
-                return (Grade)(int)Math.Round(gr);
+                return gr;
             }
 
             public void StartUpdate()
@@ -77,7 +77,7 @@ namespace University_Management_Project
                 for (int i = 0; i < Students.Count; i++)
                 {
                     var student = Students[i];
-                    if (student.AdmissionDate + CourseTime >= now)
+                    if (now - student.AdmissionDate >= CourseTime)
                     {
                         Graduate(ref i);
                     }
@@ -86,33 +86,41 @@ namespace University_Management_Project
 
             private void Admit()
             {
-                List<(Grade g, ApplicationResume resume)> localList;
+                List<(decimal g, ApplicationResume resume)> localList;
 
-                localList = new List<(Grade g, ApplicationResume resume)>();
+                localList = new List<(decimal, ApplicationResume)>();
                 foreach (var resume in Applications)
                 {
-                    Grade g = CountAvarageAdmissionExamGrade(resume.Student);
-                    if (g >= Grade.C)
+                    decimal g = CountAvarageAdmissionExamGrade(resume.Student);
+                    if (g >= (int)Grade.C)
                     {
                         localList.Add((g, resume));
                     }
                     else
                     {
-                        University.Administration.SendEmailToStudent(resume.Student.PassportID, "Your application has been rejected");
+                        University.Administration.SendEmailToStudent(resume.Student.Email, "Your application has been rejected");
                     }
                 }
 
-                localList.Sort((a, b) => a.g.CompareTo(b.g));
+                localList.Sort((a, b) =>
+                {
+                    int result = a.g.CompareTo(b.g);
+                    if (result == 0)
+                    {
+                        result = b.resume.ApplicationDate.CompareTo(a.resume.ApplicationDate);
+                    }
+                    return result;
+                });
 
                 for (int i = localList.Count - 1; i >= 0; i--)
                 {
                     if (FreeSeats == 0)
                     {
-                        University.Administration.SendEmailToStudent(localList[i].resume.Student.PassportID, "Your application has been rejected");
+                        University.Administration.SendEmailToStudent(localList[i].resume.Student.Email, "Your application has been rejected");
                     }
                     else
                     {
-                        University.AddStudent(ID, localList[i].resume.Student);
+                        University.TryAddingStudent(ID, localList[i].resume.Student);
                     }
                 }
 
@@ -122,8 +130,10 @@ namespace University_Management_Project
             private void Graduate(ref int i)
             {
                 var student = Students[i];
+                University.Administration.SendEmailToStudent(student.Email, $"Congrates! You have graduated from {University.Name}.");
                 University.ApplyingAndNotStudents.Remove(student.PassportID);
                 University.Students.Remove((this, student));
+                University.StudentsSet.Remove(student.PassportID);
 
                 Students.RemoveAt(i);
                 i--;
@@ -131,10 +141,10 @@ namespace University_Management_Project
 
             public Message AddStudent(StudentModel st)
             {
-                int s = University.ApplyingAndNotStudents.Count;
-                University.ApplyingAndNotStudents.Add(st.PassportID);
+                int s = University.StudentsSet.Count;
+                University.StudentsSet.Add(st.PassportID);
 
-                if (s == University.ApplyingAndNotStudents.Count)
+                if (s == University.StudentsSet.Count)
                 {
                     return new Message("Invalid Passport ID.", "The student with that passport id has already applied for the university.");
                 }

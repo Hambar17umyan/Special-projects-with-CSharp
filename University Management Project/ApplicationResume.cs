@@ -2,14 +2,16 @@
 {
     internal class ApplicationResume
     {
-        public StudentInputModel Student;
-        public FacultyDescribtionTransferType Faculty;
+        public readonly StudentInputModel Student;
+        public readonly FacultyDescribtionTransferType Faculty;
+        public readonly DateTime ApplicationDate;
 
 
         public ApplicationResume(StudentInputModel student, FacultyDescribtionTransferType faculty)
         {
             Student = student;
             Faculty = faculty;
+            ApplicationDate = DateTime.Now;
         }
     }
 }

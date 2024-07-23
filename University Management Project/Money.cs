@@ -10,11 +10,13 @@ namespace University_Management_Project
             Currency = currency;
         }
 
+        private decimal amount;
+
         public decimal Amount
         {
             get
             {
-                return Amount;
+                return amount;
             }
             set
             {
@@ -22,7 +24,7 @@ namespace University_Management_Project
                 {
                     throw new Exception("The amount of money cannot be negative");
                 }
-                else Amount = value;
+                else amount = value;
             }
         }
         public Currency Currency { get; set; }
@@ -67,6 +69,42 @@ namespace University_Management_Project
         public static bool operator >=(Money a, Money b)
         {
             return !(a < b);
+        }
+
+        public static Money operator +(Money a, Money b)
+        {
+            if (a.Currency != b.Currency)
+            {
+                Bank.ExchangeMoney(ref b, a.Currency);
+                a.Amount += b.Amount;
+                return a;
+            }
+            else
+            {
+                a.Amount += b.Amount;
+                return a;
+            }
+        }
+
+        public static Money operator -(Money a, Money b)
+        {
+            if (a.Currency != b.Currency)
+            {
+                Bank.ExchangeMoney(ref b, a.Currency);
+                a.Amount -= b.Amount;
+                return a;
+            }
+            else
+            {
+                a.Amount -= b.Amount;
+                return a;
+            }
+        }
+
+        public static Money operator *(Money a, int b)
+        {
+            a.Amount *= b;
+            return a;
         }
 
         public override bool Equals(object? obj)

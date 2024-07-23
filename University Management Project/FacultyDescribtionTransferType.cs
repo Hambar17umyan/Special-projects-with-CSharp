@@ -10,5 +10,11 @@ namespace University_Management_Project
     {
         public int UniversityID;
         public int FacultyID;
+
+        public FacultyDescribtionTransferType(int universityID, int facultyID)
+        {
+            UniversityID = universityID;
+            FacultyID = facultyID;
+        }
     }
 }

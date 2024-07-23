@@ -16,5 +16,11 @@ namespace University_Management_Project
             Count = 0;
             Universities = new List<University>();
         }
+
+
+        private static StudentOutputModel GetStudentOutputModel(StudentModel student)
+        {
+            return new StudentOutputModel(student.FacultyID, student.AdmissionDate, student.FirstName, student.LastName, student.GPA, student.Grades, student.PassportID, student.StudentID, student.UniversityID);
+        }
     }
 }

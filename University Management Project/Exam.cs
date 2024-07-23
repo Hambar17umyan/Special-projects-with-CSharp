@@ -17,6 +17,6 @@ namespace University_Management_Project
         Politics = 32,
         Linguistics = 64,
         Literature = 128,
-        Sports = 256,
+        Art = 256,
     }
 }
