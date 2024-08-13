@@ -1,18 +1,19 @@
-﻿using Application_Core.Public_Models;
+﻿using Application_Core.Internal_Models;
+using Application_Core.Public_Models;
 using System.Collections;
 
 namespace Customer_Libriary
 {
-    public class ShoppingCart : IEnumerable<(int isbn, int count)>
+    public class ShoppingCart : IEnumerable<(int isbn, uint count)>
     {
-        private List<(int isbn, int count)> _itemISBNs;
+        private List<(int isbn, uint count)> _itemISBNs;
         internal ShoppingCart()
         {
-            _itemISBNs = new List<(int, int)>();
+            _itemISBNs = new List<(int, uint)>();
         }
         private bool CheckIfItemExists(int isbn)
         {
-            string directoryPath = @"..\..\..\Application Core\bin\Debug\net8.0\";
+            string directoryPath = @"..\..\..\..\";
             string[] txtFiles = Directory.GetFiles(directoryPath, "*.txt");
 
             foreach (var item in txtFiles)
@@ -25,26 +26,13 @@ namespace Customer_Libriary
             }
             return false;
         }
-        private bool CheckIfThereAreSufficientBooks(int isbn, int count)
-        {
-            var items = File.ReadLines(@"..\..\..\Application Core\bin\Debug\net8.0\BookStoreBooks.txt");
-            foreach (var item in items)
-            {
-                var y = item.Trim().Split(' ');
-                if (y[0] == isbn.ToString())
-                {
-                    return Convert.ToInt32(y[1]) >= count;
-                }
-            }
-            return false;
-        }
         internal Message TryAddingToCart(BookToCartDTO book)
         {
             var isbn = book.ISBN;
             var count = book.Count;
             if (CheckIfItemExists(isbn))
             {
-                if (CheckIfThereAreSufficientBooks(isbn, count))
+                if (Helper.CheckIfThereAreSufficientBooks(isbn, count))
                 {
                     for (int i = 0; i < _itemISBNs.Count; i++)
                     {
@@ -136,17 +124,17 @@ namespace Customer_Libriary
         }
         internal void ClearTheCart()
         {
-            _itemISBNs = new List<(int isbn, int count)> ();
+            _itemISBNs = new List<(int isbn, uint count)> ();
         }
         internal Message CheckIfAllIsOk()
         {
             foreach (var item in _itemISBNs)
             {
                 int isbn = item.isbn;
-                int count = item.count;
+                uint count = item.count;
                 if (CheckIfItemExists(isbn))
                 {
-                    if (CheckIfThereAreSufficientBooks(isbn, count))
+                    if (Helper.CheckIfThereAreSufficientBooks(isbn, count))
                     {
                         return Message.Success;
                     }
@@ -163,7 +151,7 @@ namespace Customer_Libriary
             }
             return new Message("Unhandled case");
         }
-        public IEnumerator<(int isbn, int count)> GetEnumerator()
+        public IEnumerator<(int isbn, uint count)> GetEnumerator()
         {
             foreach (var item in _itemISBNs)
             {

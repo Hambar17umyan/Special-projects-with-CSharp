@@ -5,7 +5,8 @@ namespace Admin_Libriary
 {
     public interface IAdminInterface
     {
-        Message TryAddingBook(BookKeyDTO book);
+        Message TryAddingNewBook(NewBookKeyDTO book);
+        Message TryAddingBookNumber(BookKeyDTO book);
         Message TryRemovingBook(RemoveBookDTO book);
         Message TryUpdatingBookPrice(BookPriceUpdateDTO book);
         SearchResult SearchBook(params SearchCriteria[] searchCriteria);

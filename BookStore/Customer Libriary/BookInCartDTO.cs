@@ -3,8 +3,8 @@
     public class BookInCartDTO
     {
         public readonly int ISBN;
-        public readonly int Count;
-        public BookInCartDTO(int isbn, int count)
+        public readonly uint Count;
+        public BookInCartDTO(int isbn, uint count)
         {
             Count = count;
             ISBN = isbn;

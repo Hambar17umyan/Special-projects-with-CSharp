@@ -3,9 +3,9 @@
     public class RemoveBookDTO
     {
         public readonly int Isbn;
-        public readonly int Count;
+        public readonly uint Count;
 
-        public RemoveBookDTO(int isbn, int count)
+        public RemoveBookDTO(int isbn, uint count)
         {
             Isbn = isbn;
             Count = count;

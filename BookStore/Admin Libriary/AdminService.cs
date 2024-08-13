@@ -1,4 +1,5 @@
 ﻿using Application_Core;
+using Application_Core.Internal_Models;
 using Application_Core.Public_Models;
 using System.Text.Json;
 
@@ -9,7 +10,7 @@ namespace Admin_Libriary
         public List<BookInfoDTO> GetBooksInfo()
         {
             var res = new List<BookInfoDTO>();
-            string directoryPath = @"..\..\..\Application Core\bin\Debug\net8.0\";
+            string directoryPath = @"..\..\..\..\";
 
             string[] txtFiles = Directory.GetFiles(directoryPath, "*.txt");
             foreach (string filePath in txtFiles)
@@ -26,7 +27,7 @@ namespace Admin_Libriary
         public SearchResult SearchBook(params SearchCriteria[] searchCriteria)
         {
             List<BookInfoDTO> list = new List<BookInfoDTO>();
-            string directoryPath = @"..\..\..\Application Core\bin\Debug\net8.0\";
+            string directoryPath = @"..\..\..\..\";
             string[] txtFiles = Directory.GetFiles(directoryPath, "*.txt");
             foreach (string filePath in txtFiles)
             {
@@ -105,9 +106,29 @@ namespace Admin_Libriary
             return new SearchResult(list);
         }
 
-        public Message TryAddingBook(BookKeyDTO book)
+        public Message TryAddingNewBook(NewBookKeyDTO book)
         {
-            throw new NotImplementedException();
+            if(CheckIfItemExists(book.ISBN))
+            {
+                return new Message("Failed to add new book.", "There are already books with that ISBN.");
+            }
+            string path = $@"..\..\..\..\{book.ISBN}.txt";
+            var e = new BookModel(book.Title, book.Description, book.Authors, book.ISBN, book.Category, book.Price, book.StockQuantity);
+            File.WriteAllText(path, JsonSerializer.Serialize(e));
+            return Message.Success;
+        }
+
+        public Message TryAddingBookNumber(BookKeyDTO book)
+        {
+            if (!CheckIfItemExists(book.ISBN))
+            {
+                return new Message("Failed to add the number of book.", "There are no books with that ISBN.");
+            }
+            string path = $@"..\..\..\..\";
+            BookModel model = JsonSerializer.Deserialize<BookModel>(File.ReadAllText(path));
+            model.StockQuantity += book.Count;
+            File.WriteAllText(path, JsonSerializer.Serialize(model));
+            return Message.Success;
         }
 
         public Message TryRemovingBook(RemoveBookDTO book)
@@ -116,9 +137,9 @@ namespace Admin_Libriary
             var count = book.Count;
             if (CheckIfItemExists(isbn))
             {
-                if (CheckIfThereAreSufficientBooks(isbn, count))
+                if (Helper.CheckIfThereAreSufficientBooks(isbn, count))
                 {
-                    string path = @$"..\..\..\Application Core\bin\Debug\net8.0\{isbn}.txt";
+                    string path = @$"..\..\..\..\{isbn}.txt";
                     var a = File.ReadAllText(path);
                     BookModel b = JsonSerializer.Deserialize<BookModel>(a);
                     b.StockQuantity -= count; 
@@ -144,7 +165,7 @@ namespace Admin_Libriary
 
         private bool CheckIfItemExists(int isbn)
         {
-            string directoryPath = @"..\..\..\Application Core\bin\Debug\net8.0\";
+            string directoryPath = @"..\..\..\..\";
             string[] txtFiles = Directory.GetFiles(directoryPath, "*.txt");
 
             foreach (var item in txtFiles)
@@ -157,23 +178,18 @@ namespace Admin_Libriary
             }
             return false;
         }
-        private bool CheckIfThereAreSufficientBooks(int isbn, int count)
-        {
-            var items = File.ReadLines(@"..\..\..\Application Core\bin\Debug\net8.0\BookStoreBooks.txt");
-            foreach (var item in items)
-            {
-                var y = item.Trim().Split(' ');
-                if (y[0] == isbn.ToString())
-                {
-                    return Convert.ToInt32(y[1]) >= count;
-                }
-            }
-            return false;
-        }
 
         public Message TryUpdatingBookPrice(BookPriceUpdateDTO book)
         {
-            throw new NotImplementedException();
+            if (!CheckIfItemExists(book.ISBN))
+            {
+                return new Message("Failed to update the book price.", "There are no books with that ISBN.");
+            }
+            string path = $@"..\..\..\bin\Debug\net8.0\{book.ISBN}.txt";
+            BookModel model = JsonSerializer.Deserialize<BookModel>(File.ReadAllText(path));
+            model.Price = book.NewPrice;
+            File.WriteAllText(path, JsonSerializer.Serialize(model));
+            return Message.Success;
         }
     }
 }

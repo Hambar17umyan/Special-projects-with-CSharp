@@ -17,7 +17,7 @@ namespace Customer_Libriary
         public List<BookInfoDTO> GetBooksInfo()
         {
             var res = new List<BookInfoDTO>();
-            string directoryPath = @"..\..\..\Application Core\bin\Debug\net8.0\";
+            string directoryPath = @"..\..\..\..\";
 
             string[] txtFiles = Directory.GetFiles(directoryPath, "*.txt");
             foreach (string filePath in txtFiles)
@@ -34,7 +34,7 @@ namespace Customer_Libriary
         public SearchResult SearchBook(params SearchCriteria[] searchCriterias)
         {
             List<BookInfoDTO> list = new List<BookInfoDTO>();
-            string directoryPath = @"..\..\..\Application Core\bin\Debug\net8.0\";
+            string directoryPath = @"..\..\..\..\";
             string[] txtFiles = Directory.GetFiles(directoryPath, "*.txt");
             foreach (string filePath in txtFiles)
             {
@@ -122,7 +122,7 @@ namespace Customer_Libriary
         {
             foreach (var i in ShoppingCart)
             {
-                string path = @$"..\..\..\Application Core\bin\Debug\net8.0\{i.isbn}.txt";
+                string path = @$"..\..\..\..\{i.isbn}.txt";
                 var a = File.ReadAllText(path);
                 BookModel b = JsonSerializer.Deserialize<BookModel>(a);
                 b.StockQuantity -= i.count;
